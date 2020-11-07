@@ -23,8 +23,8 @@ module.exports.GetNitSolvency = async (event) => {
     // Intercepting images, stylesheets and fonts
     await page.setRequestInterception(true);
     page.on('request', (req) => {
-      const assets = ['image', 'stylesheet', 'font'];
-      // const assets = [];
+      //const assets = ['image', 'stylesheet', 'font'];
+      const assets = [];
       if (assets.includes(req.resourceType())) {
         req.abort();
       } else {
@@ -39,6 +39,30 @@ module.exports.GetNitSolvency = async (event) => {
     console.log('Opening NIT_SOLVENCY_URL...');
     await page.goto(NIT_SOLVENCY_URL);
     console.log('Opening NIT_SOLVENCY_URL... OK');
+
+    console.log('Screenshoting...');
+    const imgSelector = '#img';
+    // await page.waitForSelector(imgSelector);
+    // await page.waitFor(500);
+    const clip = await page.$eval(imgSelector, (element) => {
+      element.scrollIntoViewIfNeeded();
+      const { height, width, x, y } = element.getBoundingClientRect();
+      return { height, width, x, y };
+    });
+
+    // console.log(clip);
+    const imgB64 = await page.screenshot({
+      type: 'png',
+      clip: clip,
+      encoding: 'base64',
+    });
+    // console.log(imgB64);
+    console.log('Screenshoting... OK');
+
+    console.log('Typing NIT...');
+    const nitSelector = '#nit';
+    await page.type(nitSelector, nit);
+    console.log('Typing NIT... OK');
 
     let solvency = 'Dummy';
     console.log('Solvency:', solvency);
