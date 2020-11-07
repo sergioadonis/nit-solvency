@@ -22,11 +22,13 @@ frameworkVersion: '2'
 
 provider:
   name: aws
+  region: us-east-1
   runtime: nodejs12.x
+  versionFunctions: false
 
 # you can overwrite defaults here
 #  stage: dev
-#  region: us-east-1
+#
 
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
@@ -70,6 +72,12 @@ functions:
                 nit: true
     environment:
       NIT_SOLVENCY_URL: ${env:NIT_SOLVENCY_URL}
+    layers:
+      # Google Chrome for AWS Lambda as a layer
+      # https://github.com/shelfio/chrome-aws-lambda-layer
+      - arn:aws:lambda:${self:provider.region}:764866452798:layer:chrome-aws-lambda:10
+    memorySize: 2048 # recommended
+    timeout: 30
 # you can add CloudFormation resource templates here
 #resources:
 #  Resources:

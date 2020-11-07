@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "chrome-aws-lambda": "^5.3.1",
     "serverless-dotenv-plugin": "^3.1.0"
   }
 }
