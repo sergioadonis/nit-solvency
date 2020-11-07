@@ -1,7 +1,10 @@
 'use strict';
 
+const { NIT_SOLVENCY_URL } = process.env;
+
 module.exports.GetNitSolvency = async (event) => {
-  console.log('event:', event);
+  // console.log('event:', event);
+  console.log('NIT_SOLVENCY_URL:', NIT_SOLVENCY_URL);
 
   const { nit } = event.pathParameters;
   console.log('NIT:', nit);
