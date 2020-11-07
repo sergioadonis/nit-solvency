@@ -1,12 +1,21 @@
 'use strict';
 
-module.exports.hello = async event => {
+module.exports.GetNitSolvency = async (event) => {
+  console.log('event:', event);
+
+  const { nit } = event.pathParameters;
+  console.log('NIT:', nit);
+
+  let solvency = 'Dummy';
+  console.log('Solvency:', solvency);
+
   return {
     statusCode: 200,
     body: JSON.stringify(
       {
-        message: 'Go Serverless v1.0! Your function executed successfully!',
-        input: event,
+        message: 'Ok',
+        nit: nit,
+        solvency: solvency,
       },
       null,
       2

@@ -58,15 +58,19 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  hello:
-    handler: handler.hello
-#    The following are a few example events you can configure
-#    NOTE: Please make sure to change your handler code to work with those events
-#    Check the event documentation for details
-#    events:
-#      - http:
-#          path: users/create
-#          method: get
+  GetNitSolvency:
+    handler: handler.GetNitSolvency
+    #    The following are a few example events you can configure
+    #    NOTE: Please make sure to change your handler code to work with those events
+    #    Check the event documentation for details
+    events:
+      - http:
+          path: solvency/{nit}
+          method: get
+          request:
+            parameters:
+              paths:
+                nit: true
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
