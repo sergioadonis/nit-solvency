@@ -1,11 +1,14 @@
 'use strict';
+const AWS = require('aws-sdk');
+const textract = new AWS.Textract();
+
 // this module will be provided by the layer
 const chromeLambda = require('chrome-aws-lambda');
 const puppeteer = chromeLambda.puppeteer;
 
 const { NIT_SOLVENCY_URL } = process.env;
 
-module.exports.GetNitSolvency = async (event) => {
+module.exports.GetNitSolvency = async (event, context, callback) => {
   try {
     console.log('NIT_SOLVENCY_URL:', NIT_SOLVENCY_URL);
     const { nit } = event.pathParameters;
@@ -59,29 +62,85 @@ module.exports.GetNitSolvency = async (event) => {
     // console.log(imgB64);
     console.log('Screenshoting... OK');
 
-    console.log('Typing NIT...');
-    const nitSelector = '#nit';
-    await page.type(nitSelector, nit);
-    console.log('Typing NIT... OK');
-
-    let solvency = 'Dummy';
-    console.log('Solvency:', solvency);
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify(
-        {
-          message: 'Ok',
-          nit: nit,
-          solvency: solvency,
-        },
-        null,
-        2
-      ),
+    console.log('Extracting text...');
+    const params = {
+      Document: {
+        Bytes: imgB64,
+      },
     };
+
+    const textractPromise = textract.detectDocumentText(params).promise();
+    textractPromise
+      .then((data) => {
+        console.log('DATA', data);
+
+        const response = {
+          statusCode: 200,
+          body: JSON.stringify(
+            {
+              message: 'Ok',
+              nit: nit,
+              solvency: solvency,
+            },
+            null,
+            2
+          ),
+        };
+
+        callback(null, response);
+      })
+      .catch((err) => {
+        console.error(err, err.stack);
+        const response = {
+          statusCode: 500,
+          body: JSON.stringify(
+            {
+              message: 'Something was wrong',
+            },
+            null,
+            2
+          ),
+        };
+        callback(null, response);
+        return;
+      });
+
+    /*
+    textract.detectDocumentText(params, async (error, data) => {
+      if (error) {
+        throw error;
+      }
+
+      console.log('DATA', data);
+      console.log('Extracting text... OK');
+
+      console.log('Typing NIT...');
+      const nitSelector = '#nit';
+      await page.type(nitSelector, nit);
+      console.log('Typing NIT... OK');
+
+      let solvency = 'Dummy';
+      console.log('Solvency:', solvency);
+
+      const response = {
+        statusCode: 200,
+        body: JSON.stringify(
+          {
+            message: 'Ok',
+            nit: nit,
+            solvency: solvency,
+          },
+          null,
+          2
+        ),
+      };
+
+      callback(null, response);
+    });
+    */
   } catch (e) {
-    console.error(e);
-    return {
+    console.error(e, e.stack);
+    const response = {
       statusCode: 500,
       body: JSON.stringify(
         {
@@ -91,5 +150,7 @@ module.exports.GetNitSolvency = async (event) => {
         2
       ),
     };
+    callback(null, response);
+    return;
   }
 };

@@ -24,7 +24,13 @@ provider:
   name: aws
   region: us-east-1
   runtime: nodejs12.x
-  versionFunctions: false
+  # versionFunctions: false
+
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'textract:DetectDocumentText'
+      Resource: '*'
 
 # you can overwrite defaults here
 #  stage: dev
@@ -46,19 +52,6 @@ provider:
 #            - "Ref" : "ServerlessDeploymentBucket"
 #            - "/*"
 
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
-
-# you can add packaging information here
-#package:
-#  include:
-#    - include-me.js
-#    - include-me-dir/**
-#  exclude:
-#    - exclude-me.js
-#    - exclude-me-dir/**
-
 functions:
   GetNitSolvency:
     handler: handler.GetNitSolvency
@@ -78,16 +71,6 @@ functions:
       - arn:aws:lambda:${self:provider.region}:764866452798:layer:chrome-aws-lambda:10
     memorySize: 2048 # recommended
     timeout: 30
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+
 plugins:
   - serverless-dotenv-plugin
